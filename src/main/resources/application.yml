@@ -2,19 +2,14 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: user-service
-          uri: lb://USER-SERVICE
+        - id: test-route
+          uri: https://httpbin.org
           predicates:
-            - Path=/api/users/**
+            - Path=/api/test/**
           filters:
-            - name: CircuitBreaker
-              args:
-                name: userServiceCB
-                fallbackUri: forward:/fallback/users
-            - name: RequestRateLimiter
-              args:
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
-            - name: CacheRequest
-              args:
-                ttl: 300
+            - RewritePath=/api/test/(?<segment>.*), /$\{segment}
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    reactor.netty: DEBUG
