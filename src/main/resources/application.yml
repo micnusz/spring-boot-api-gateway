@@ -7,9 +7,22 @@ spring:
           predicates:
             - Path=/api/test/**
           filters:
+            - name: CircuitBreaker
+              args:
+                name: testCB
+                fallbackUri: forward:/fallback/test
+
+            - name: Retry
+              args:
+                retries: 2
+                statuses: BAD_GATEWAY, SERVICE_UNAVAILABLE, INTERNAL_SERVER_ERROR
+
             - RewritePath=/api/test/(?<segment>.*), /$\{segment}
+
+
 
 logging:
   level:
     org.springframework.cloud.gateway: DEBUG
     reactor.netty: DEBUG
+    io.github.resilience4j: DEBUG
